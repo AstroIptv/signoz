@@ -77,7 +77,7 @@ services:
         mv histogram-quantile /var/lib/clickhouse/user_scripts/histogramQuantile
     restart: on-failure
     volumes:
-      - /common/clickhouse/user_scripts:/var/lib/clickhouse/user_scripts/
+      - /deploy/common/clickhouse/user_scripts:/var/lib/clickhouse/user_scripts/
   zookeeper-1:
     <<: *zookeeper-defaults
     container_name: signoz-zookeeper-1
@@ -101,13 +101,13 @@ services:
     #   - "8123:8123"
     #   - "9181:9181"
     volumes:
-      - /common/clickhouse/config.xml:/etc/clickhouse-server/config.xml
-      - /common/clickhouse/users.xml:/etc/clickhouse-server/users.xml
-      - /common/clickhouse/custom-function.xml:/etc/clickhouse-server/custom-function.xml
-      - /common/clickhouse/user_scripts:/var/lib/clickhouse/user_scripts/
-      - /common/clickhouse/cluster.xml:/etc/clickhouse-server/config.d/cluster.xml
+      - /deploy/common/clickhouse/config.xml:/etc/clickhouse-server/config.xml
+      - /deploy/common/clickhouse/users.xml:/etc/clickhouse-server/users.xml
+      - /deploy/common/clickhouse/custom-function.xml:/etc/clickhouse-server/custom-function.xml
+      - /deploy/common/clickhouse/user_scripts:/var/lib/clickhouse/user_scripts/
+      - /deploy/common/clickhouse/cluster.xml:/etc/clickhouse-server/config.d/cluster.xml
       - clickhouse:/var/lib/clickhouse/
-      # - /common/clickhouse/storage.xml:/etc/clickhouse-server/config.d/storage.xml
+      # - /deploy/common/clickhouse/storage.xml:/etc/clickhouse-server/config.d/storage.xml
   alertmanager:
     <<: *common
     image: signoz/alertmanager:${ALERTMANAGER_TAG:-0.23.7}
@@ -132,8 +132,8 @@ services:
     #   - "3301:8080"     # signoz port
     #   - "6060:6060"     # pprof port
     volumes:
-      - /common/signoz/prometheus.yml:/root/config/prometheus.yml
-      - /common/dashboards:/root/config/dashboards
+      - /deploy/common/signoz/prometheus.yml:/root/config/prometheus.yml
+      - /deploy/common/dashboards:/root/config/dashboards
       - sqlite:/var/lib/signoz/
     environment:
       - ClickHouseUrl=tcp://clickhouse:9000
@@ -164,7 +164,7 @@ services:
     ports:
       - "3301:3301"
     volumes:
-      - /common/signoz/nginx-config.conf:/etc/nginx/conf.d/default.conf
+      - /deploy/common/signoz/nginx-config.conf:/etc/nginx/conf.d/default.conf
   otel-collector:
     <<: *db-depend
     image: signoz/signoz-otel-collector:${OTELCOL_TAG:-0.111.29}
@@ -176,7 +176,7 @@ services:
       - --feature-gates=-pkg.translator.prometheus.NormalizeName
     volumes:
       - /otel-collector-config.yaml:/etc/otel-collector-config.yaml
-      - /common/signoz/otel-collector-opamp-config.yaml:/etc/manager-config.yaml
+      - /deploy/common/signoz/otel-collector-opamp-config.yaml:/etc/manager-config.yaml
     environment:
       - OTEL_RESOURCE_ATTRIBUTES=host.name=signoz-host,os.type=linux
       - LOW_CARDINAL_EXCEPTION_GROUPING=false
